@@ -8,11 +8,8 @@ void Calculate();
 void Parse();
 void Error();
 void interupt();
-<<<<<<< HEAD
-=======
 void Wipe_Vars();
 void Clear();
->>>>>>> 166f03263a0159f00e75a4e37f9b632465a54628
 
 const int keyRows= 4; //Keypad Rows
 const int keyCols= 4; //Keypad Columns
@@ -32,13 +29,8 @@ Keypad myKeypad= Keypad(makeKeymap(keymap), rowPins, colPins, keyRows, keyCols);
 
 //Variable Declarations
 float num_1, num_2, ans;
-<<<<<<< HEAD
-String num_1_str ="", num_2_str="", test, input ="";
-bool mulFlag = false, addFlag = false, subFlag = false, divFlag = false;
-=======
 String num_1_str ="", num_2_str="", input ="";
 bool mulFlag = false, addFlag = false, subFlag = false, divFlag = false, clearFlag = false, prevCalc = false;
->>>>>>> 166f03263a0159f00e75a4e37f9b632465a54628
 bool errorFlag = false;
 char x[7];
 
@@ -116,21 +108,25 @@ void Calculate() {
     addFlag = false;
     prevCalc = true;
     ans = num_1 + num_2;
+    Wipe_Vars();
   }
   else if (subFlag) {
     subFlag = false;
     prevCalc = true;
     ans = num_1 - num_2;
+    Wipe_Vars();
   }
   else if(mulFlag) {
     mulFlag = false;
     prevCalc = true;
     ans = num_1 * num_2;
+    Wipe_Vars();
   }
   else if (divFlag) {
     divFlag = false;
     prevCalc = true;
     ans = num_1 / num_2;
+    Wipe_Vars();
   }
   else {
     errorFlag = true;
@@ -268,40 +264,61 @@ void Parse() {
 
         if(mulFlag || divFlag || addFlag || subFlag)
         {//if no numbers are negative
-          if(leftNegative == false)
+          if(rightNegative == false && leftNegative == false)
           {
             for(int i = 0; i < opIndex; ++i)
             {
               num_1_str = num_1_str + input[i];
-            }else
-            {
-              for(int i = 1; i < opIndex; ++i)
-              {
-                num_1_str = num_1_str + input[i];
-              }
             }
-          }
-          if(rightNegative == false)
-          {
             for(int i = opIndex + 1; i < input.length(); ++i)
             {
               num_2_str = num_2_str + input[i];
             }
-          }else{
-            for(int i = opIndex + 2; i< input.length(); ++i)
-            {
-              num_2str = num_2_str + input[i];
-            }
+            num_1 = num_1_str.toFloat();
+            num_2 = num_2_str.toFloat();
           }
-          num_1 = num_1_str.toFloat();
-          //converts num 1 to negative if lefthand negative flag is set
-          if(leftNegative == true){
-          num_1 = num_1 * (-1);
-          }
-          //creates num_2 and sets it negative if rightHand negative is true            num_2 = num_2_str.toFloat();
-          if(rightNegative == true)
+          if(rightNegative == true && leftNegative == false)
           {
+            for(int i = 0; i < opIndex; ++i)
+            {
+              num_1_str = num_1_str + input[i];
+            }
+            for(int i = opIndex + 1; i < input.length(); ++i)
+            {
+              num_2_str = num_2_str + input[i];
+            }
+            num_1 = num_1_str.toFloat();
+            num_1 = num_1 *(-1);
+            num_2 = num_2_str.toFloat();
+          }
+          if(rightNegative == false && leftNegative == true)
+          {
+            for(int i = 0; i < opIndex; ++i)
+            {
+              num_1_str = num_1_str + input[i];
+            }
+            for(int i = opIndex + 1; i < input.length(); ++i)
+            {
+              num_2_str = num_2_str + input[i];
+            }
+            num_1 = num_1_str.toFloat();
+            num_2 = num_2_str.toFloat();
             num_2 = num_2 * (-1);
+          }
+          if(rightNegative == true && leftNegative == true)
+          {
+            for(int i = 0; i < opIndex; ++i)
+            {
+              num_1_str = num_1_str + input[i];
+            }
+            for(int i = opIndex + 1; i < input.length(); ++i)
+            {
+              num_2_str = num_2_str + input[i];
+            }
+            num_1 = num_1_str.toFloat();
+            num_1 = num_1 * (-1);
+            num_2 = num_2_str.toFloat();
+            num_2 = num_2 *(-1);
           }
         }
     }else{/*serial.print("There was an error, too many operators")*/}
@@ -350,8 +367,6 @@ void Clear() {
   lcd.setCursor(0,0);
   lcd.print("                ");
 }
-<<<<<<< HEAD
-=======
 
 void Wipe_Vars() {
   num_1 = 0;
@@ -360,4 +375,3 @@ void Wipe_Vars() {
   num_2_str = "";
   input = "";
 }
->>>>>>> 166f03263a0159f00e75a4e37f9b632465a54628
