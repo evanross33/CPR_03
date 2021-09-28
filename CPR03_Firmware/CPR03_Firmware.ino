@@ -8,11 +8,8 @@ void Calculate();
 void Parse();
 void Error();
 void interupt();
-<<<<<<< HEAD
-=======
 void Wipe_Vars();
 void Clear();
->>>>>>> 166f03263a0159f00e75a4e37f9b632465a54628
 
 const int keyRows= 4; //Keypad Rows
 const int keyCols= 4; //Keypad Columns
@@ -32,13 +29,8 @@ Keypad myKeypad= Keypad(makeKeymap(keymap), rowPins, colPins, keyRows, keyCols);
 
 //Variable Declarations
 float num_1, num_2, ans;
-<<<<<<< HEAD
-String num_1_str ="", num_2_str="", test, input ="";
-bool mulFlag = false, addFlag = false, subFlag = false, divFlag = false;
-=======
 String num_1_str ="", num_2_str="", input ="";
 bool mulFlag = false, addFlag = false, subFlag = false, divFlag = false, clearFlag = false, prevCalc = false;
->>>>>>> 166f03263a0159f00e75a4e37f9b632465a54628
 bool errorFlag = false;
 char x[7];
 
@@ -273,14 +265,14 @@ void Parse() {
             for(int i = 0; i < opIndex; ++i)
             {
               num_1_str = num_1_str + input[i];
-            }else
+            }
+          }else
             {
               for(int i = 1; i < opIndex; ++i)
               {
                 num_1_str = num_1_str + input[i];
               }
             }
-          }
           if(rightNegative == false)
           {
             for(int i = opIndex + 1; i < input.length(); ++i)
@@ -290,7 +282,7 @@ void Parse() {
           }else{
             for(int i = opIndex + 2; i< input.length(); ++i)
             {
-              num_2str = num_2_str + input[i];
+              num_2_str = num_2_str + input[i];
             }
           }
           num_1 = num_1_str.toFloat();
@@ -350,8 +342,6 @@ void Clear() {
   lcd.setCursor(0,0);
   lcd.print("                ");
 }
-<<<<<<< HEAD
-=======
 
 void Wipe_Vars() {
   num_1 = 0;
@@ -360,4 +350,3 @@ void Wipe_Vars() {
   num_2_str = "";
   input = "";
 }
->>>>>>> 166f03263a0159f00e75a4e37f9b632465a54628
