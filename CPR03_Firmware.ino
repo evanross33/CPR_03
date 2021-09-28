@@ -252,61 +252,40 @@ void Parse() {
 
         if(mulFlag || divFlag || addFlag || subFlag)
         {//if no numbers are negative
-          if(rightNegative == false && leftNegative == false)
+          if(leftNegative == false)
           {
             for(int i = 0; i < opIndex; ++i)
             {
               num_1_str = num_1_str + input[i];
-            }
-            for(int i = opIndex + 1; i < input.length(); ++i)
+            }else
             {
-              num_2_str = num_2_str + input[i];
+              for(int i = 1; i < opIndex; ++i)
+              {
+                num_1_str = num_1_str + input[i];
+              }
             }
-            num_1 = num_1_str.toFloat();
-            num_2 = num_2_str.toFloat();
           }
-          if(rightNegative == true && leftNegative == false)
+          if(rightNegative == false)
           {
-            for(int i = 0; i < opIndex; ++i)
-            {
-              num_1_str = num_1_str + input[i];
-            }
             for(int i = opIndex + 1; i < input.length(); ++i)
             {
               num_2_str = num_2_str + input[i];
             }
-            num_1 = num_1_str.toFloat();
-            num_1 = num_1 *(-1);
-            num_2 = num_2_str.toFloat();
+          }else{
+            for(int i = opIndex + 2; i< input.length(); ++i)
+            {
+              num_2str = num_2_str + input[i];
+            }
           }
-          if(rightNegative == false && leftNegative == true)
+          num_1 = num_1_str.toFloat();
+          //converts num 1 to negative if lefthand negative flag is set
+          if(leftNegative == true){
+          num_1 = num_1 * (-1);
+          }
+          //creates num_2 and sets it negative if rightHand negative is true            num_2 = num_2_str.toFloat();
+          if(rightNegative == true)
           {
-            for(int i = 0; i < opIndex; ++i)
-            {
-              num_1_str = num_1_str + input[i];
-            }
-            for(int i = opIndex + 1; i < input.length(); ++i)
-            {
-              num_2_str = num_2_str + input[i];
-            }
-            num_1 = num_1_str.toFloat();
-            num_2 = num_2_str.toFloat();
             num_2 = num_2 * (-1);
-          }
-          if(rightNegative == true && leftNegative == true)
-          {
-            for(int i = 0; i < opIndex; ++i)
-            {
-              num_1_str = num_1_str + input[i];
-            }
-            for(int i = opIndex + 1; i < input.length(); ++i)
-            {
-              num_2_str = num_2_str + input[i];
-            }
-            num_1 = num_1_str.toFloat();
-            num_1 = num_1 * (-1);
-            num_2 = num_2_str.toFloat();
-            num_2 = num_2 *(-1);
           }
         }
     }else{/*serial.print("There was an error, too many operators")*/}
