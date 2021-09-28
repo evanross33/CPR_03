@@ -27,7 +27,7 @@ Keypad myKeypad= Keypad(makeKeymap(keymap), rowPins, colPins, keyRows, keyCols);
 
 //Variable Declarations
 float num_1, num_2, ans;
-String num_1_str ="", num_2_str="", test, input ="";
+String num_1_str ="", num_2_str="", input ="";
 bool mulFlag = false, addFlag = false, subFlag = false, divFlag = false;
 bool errorFlag = false;
 char x[7];
