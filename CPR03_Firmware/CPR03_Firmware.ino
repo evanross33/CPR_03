@@ -9,6 +9,7 @@ void Parse();
 void Error();
 void interupt();
 void Wipe_Vars();
+void Clear();
 
 const int keyRows= 4; //Keypad Rows
 const int keyCols= 4; //Keypad Columns
@@ -29,18 +30,16 @@ Keypad myKeypad= Keypad(makeKeymap(keymap), rowPins, colPins, keyRows, keyCols);
 //Variable Declarations
 float num_1, num_2, ans;
 String num_1_str ="", num_2_str="", input ="";
-bool mulFlag = false, addFlag = false, subFlag = false, divFlag = false;
+bool mulFlag = false, addFlag = false, subFlag = false, divFlag = false, clearFlag = false, prevCalc = false;
 bool errorFlag = false;
 char x[7];
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 void setup(){
-  Serial.begin(9600);
-  attachInterrupt(digitalPinToInterrupt(2), Clear, RISING);
+  attachInterrupt(digitalPinToInterrupt(2), Clear_Int, RISING);
   lcd.init();
   lcd.backlight();
-  Serial.begin(9600);
   lcd.setCursor(0,0);
   lcd.print("Hello");
   delay(2000);
@@ -52,6 +51,15 @@ void setup(){
 void loop(){
   lcd.setCursor(0,0);
   char keyEntry = myKeypad.getKey();
+  if (clearFlag) {
+    clearFlag = 0;
+    Clear();
+  }
+  if (prevCalc) {
+    prevCalc = false;
+    lcd.setCursor(0,0);
+    lcd.print("                ");
+  }
   if (keyEntry != NO_KEY) {
     if (keyEntry == '!') {
       interupt();
@@ -78,9 +86,6 @@ void loop(){
 }
 
 void interupt() {
-  static unsigned long last_interrupt_time = 0;
-  unsigned long interrupt_time = millis();
-  if(interrupt_time - last_interrupt_time > 500){
     Parse();
     if (errorFlag) {
       Error();
@@ -97,27 +102,29 @@ void interupt() {
       }
     }
   }
-    last_interrupt_time = interrupt_time;
-}
 
 void Calculate() {
   if (addFlag) {
     addFlag = false;
+    prevCalc = true;
     ans = num_1 + num_2;
     Wipe_Vars();
   }
   else if (subFlag) {
     subFlag = false;
+    prevCalc = true;
     ans = num_1 - num_2;
     Wipe_Vars();
   }
   else if(mulFlag) {
     mulFlag = false;
+    prevCalc = true;
     ans = num_1 * num_2;
     Wipe_Vars();
   }
   else if (divFlag) {
     divFlag = false;
+    prevCalc = true;
     ans = num_1 / num_2;
     Wipe_Vars();
   }
@@ -244,7 +251,6 @@ void Parse() {
 }
 
 void Error(){
-  Serial.println("start error");
   errorFlag = false;
   divFlag = false;
   mulFlag = false;
@@ -262,20 +268,30 @@ void Error(){
   lcd.setCursor(0,0);
   lcd.print("Error");
   delay(2000);
-  lcd.print(input);
+  lcd.setCursor(0,0);
+  lcd.print("                ");
+}
 
+void Clear_Int() {
+  static unsigned long last_interrupt_time = 0;
+  unsigned long interrupt_time = millis();
+  if(interrupt_time - last_interrupt_time > 500){
+  clearFlag = 1;
+  }
+  interrupt_time = last_interrupt_time;
 }
 
 void Clear() {
   lcd.setCursor(0,0);
   lcd.print("                ");
-  lcd.setCursor(1,0);
+  lcd.setCursor(0,0);
+  lcd.print("Cleared");
+  lcd.setCursor(0,1);
   lcd.print("                ");
-  input = "";
-  num_1_str = "";
-  num_2_str = "";
-  num_1 = 0;
-  num_2 = 0;
+  Wipe_Vars();
+  delay(2000);
+  lcd.setCursor(0,0);
+  lcd.print("                ");
 }
 
 void Wipe_Vars() {
@@ -283,4 +299,5 @@ void Wipe_Vars() {
   num_2 = 0;
   num_1_str = "";
   num_2_str = "";
+  input = "";
 }
