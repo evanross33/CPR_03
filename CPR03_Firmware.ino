@@ -8,7 +8,6 @@ void Calculate();
 void Parse();
 void Error();
 void interupt();
-void Wipe_Vars();
 
 const int keyRows= 4; //Keypad Rows
 const int keyCols= 4; //Keypad Columns
@@ -28,7 +27,7 @@ Keypad myKeypad= Keypad(makeKeymap(keymap), rowPins, colPins, keyRows, keyCols);
 
 //Variable Declarations
 float num_1, num_2, ans;
-String num_1_str ="", num_2_str="", input ="";
+String num_1_str ="", num_2_str="", test, input ="";
 bool mulFlag = false, addFlag = false, subFlag = false, divFlag = false;
 bool errorFlag = false;
 char x[7];
@@ -104,22 +103,18 @@ void Calculate() {
   if (addFlag) {
     addFlag = false;
     ans = num_1 + num_2;
-    Wipe_Vars();
   }
   else if (subFlag) {
     subFlag = false;
     ans = num_1 - num_2;
-    Wipe_Vars();
   }
   else if(mulFlag) {
     mulFlag = false;
     ans = num_1 * num_2;
-    Wipe_Vars();
   }
   else if (divFlag) {
     divFlag = false;
     ans = num_1 / num_2;
-    Wipe_Vars();
   }
   else {
     errorFlag = true;
@@ -350,11 +345,4 @@ void Clear() {
   num_2_str = "";
   num_1 = 0;
   num_2 = 0;
-}
-
-void Wipe_Vars() {
-  num_1 = 0;
-  num_2 = 0;
-  num_1_str = "";
-  num_2_str = "";
 }
