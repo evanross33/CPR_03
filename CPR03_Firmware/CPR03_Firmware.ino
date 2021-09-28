@@ -57,6 +57,7 @@ void loop(){
   }
   if (prevCalc) {
     prevCalc = false;
+    Wipe_Vars();
     lcd.setCursor(0,0);
     lcd.print("                ");
   }
@@ -189,33 +190,42 @@ void Parse() {
             //subtraction
             case '-':
             //flag has already been set which means more than one operator
-            if(subFlag == true)
+            if(counter == 0)
             {
-              errorFlag = true;
-              break;
-            }
-            else
-            {
-              if(counter != 0 && counter != opIndex + 1)
+              if(input[1] != '+' && input[1] != '-' && input[1] != '*' && input[1] != '/')
               {
-                subFlag = true;
-                opIndex = counter;
+                leftNegative = true;
+                break; 
+              }else{//if the char after a negative is anything other than .or num its an error
+                errorFlag = true;
                 break;
-              }else{
-                //this will see if - is a minus or a leftNegative
-                // a '-' at the beginning signifies the left hand is negative 
-                if(counter == 0)
-                {
-                  leftNegative = true;
-                }
-                //a '-' after the operator signifies the right hand side is negative
-                if(counter == opIndex + 1)
-                {
-                  rightNegative = true;
-                }
               }
             }
-
+            else{
+              if(subFlag == false)
+              {
+                if(opIndex == 0)
+                {
+                  subFlag = true;
+                  opIndex=counter;
+                }
+                if(input[counter+1] == '-')
+                {
+                  if(input[counter + 2] != '+' && input[counter + 2] != '-' && input[counter + 2] != '*' && input[counter+2] != '/'){
+                    rightNegative = true;
+                    ++counter;
+                  }else{
+                    errorFlag = true;
+                  }
+                }
+                break;
+              }else{//subFlag is already turned on
+                errorFlag = true;
+                break;
+              }
+            }
+            
+        //below is switchend brack
         }
         //while loop
         ++counter;
@@ -245,7 +255,7 @@ void Parse() {
               }
               num_1 = num_1_str.toFloat();
             }else{//if the number is negative
-              for(int i= 0; i < input.length(); ++i)
+              for(int i= 1; i < input.length(); ++i)
               {
                 num_1_str = num_1_str + input[i];
               }
@@ -258,8 +268,8 @@ void Parse() {
         //this just means if any of the flags are on, if more than one flag is on than
         //errorFlag would be on so we shouldnt get here inless something is very wrong
 
-        if(mulFlag || divFlag || addFlag || subFlag)
-        {//if no numbers are negative
+        else if(mulFlag || divFlag || addFlag || subFlag)
+        {//if leftNegative
           if(leftNegative == false)
           {
             for(int i = 0; i < opIndex; ++i)
@@ -287,10 +297,12 @@ void Parse() {
           }
           num_1 = num_1_str.toFloat();
           //converts num 1 to negative if lefthand negative flag is set
-          if(leftNegative == true){
+          if(leftNegative == true)
+          {
           num_1 = num_1 * (-1);
           }
-          //creates num_2 and sets it negative if rightHand negative is true            num_2 = num_2_str.toFloat();
+          //creates num_2 and sets it negative if rightHand negative is true            
+          num_2 = num_2_str.toFloat();
           if(rightNegative == true)
           {
             num_2 = num_2 * (-1);
