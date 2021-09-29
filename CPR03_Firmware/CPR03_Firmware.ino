@@ -7,7 +7,7 @@
 void Calculate();
 void Parse();
 void Error();
-void interupt();
+void Submit();
 void Wipe_Vars();
 void Clear();
 
@@ -28,11 +28,11 @@ byte colPins[keyCols]= {6, 5, 4, 3}; //Columns 0 to 3
 Keypad myKeypad= Keypad(makeKeymap(keymap), rowPins, colPins, keyRows, keyCols);
 
 //Variable Declarations
-float num_1, num_2, ans;
+double num_1, num_2, ans;
 String num_1_str ="", num_2_str="", input ="";
 bool mulFlag = false, addFlag = false, subFlag = false, divFlag = false, clearFlag = false, prevCalc = false;
-bool errorFlag = false;
-char x[7];
+bool errorFlag = false, overflowFlag = false, manyOps = false, noNum = false;
+char x[16];
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
@@ -41,7 +41,8 @@ void setup(){
   lcd.init();
   lcd.backlight();
   lcd.setCursor(0,0);
-  lcd.print("Hello");
+  lcd.print("Hello (^w^)");
+  
   delay(2000);
   lcd.setCursor(0,0);
   lcd.print("                ");
@@ -63,18 +64,7 @@ void loop(){
   }
   if (keyEntry != NO_KEY) {
     if (keyEntry == '!') {
-      interupt();
-      //if(!input.empty()){
-//        input="";
-//        lcd.setCursor(0,0);
-//        lcd.print("Cleared.");
-//        delay(2000);
-//        //Clearing LCD
-//        lcd.setCursor(0,0);
-//        lcd.print("                ");
-//        lcd.setCursor(0,1);
-//        lcd.print("                ");
-      //}
+      Submit();
     }
     else {
       lcd.setCursor(0,1);
@@ -86,7 +76,7 @@ void loop(){
   }
 }
 
-void interupt() {
+void Submit() {
     Parse();
     if (errorFlag) {
       Error();
@@ -97,7 +87,7 @@ void interupt() {
         Error();
       }
       else {
-        dtostrf(ans, 7, 3, x);
+        dtostrf(ans, 8, 3, x);
         lcd.setCursor(0,1);
         lcd.print(x);
       }
@@ -105,6 +95,11 @@ void interupt() {
   }
 
 void Calculate() {
+  if(input == "-" || input == "+" || input == "/" || input == "*" || num_2_str == ""){
+    noNum = true;
+    errorFlag = true;
+    return;
+  }
   if (addFlag) {
     addFlag = false;
     prevCalc = true;
@@ -134,6 +129,11 @@ void Parse() {
     //parse start
     int size = input.length();
     int counter = 0;
+    if (size > 16) {
+      overflowFlag = true;
+      errorFlag = true;
+      return;
+    }
     //operator index
     int opIndex= 0;
     bool leftNegative = false;
@@ -147,6 +147,7 @@ void Parse() {
             //flag has already been set which means more than one operator
             if(mulFlag == true)
             {
+                manyOps = true;
                 errorFlag = true;
                 break;
             }
@@ -162,6 +163,7 @@ void Parse() {
             //flag has already been set which means more than one operator
             if(divFlag == true)
             {
+                manyOps = true;
                 errorFlag = true;
                 break;
             }
@@ -177,6 +179,7 @@ void Parse() {
             //flag has already been set which means more than one operator
             if(addFlag == true)
             {
+                manyOps = true;
                 errorFlag = true;
                 break;
             }
@@ -196,7 +199,8 @@ void Parse() {
               {
                 leftNegative = true;
                 break; 
-              }else{//if the char after a negative is anything other than .or num its an error
+              }else{//if the char after a negative is anything other than . or num its an error
+                manyOps = true;
                 errorFlag = true;
                 break;
               }
@@ -220,6 +224,7 @@ void Parse() {
                 }
                 break;
               }else{//subFlag is already turned on
+                manyOps = true;
                 errorFlag = true;
                 break;
               }
@@ -235,6 +240,7 @@ void Parse() {
     //if booltest is greater than 1 than that means more than one flag is set, which is an error
     if(booltest > 1)
     {
+        manyOps = true;
         errorFlag = true;
     }
     //if errorflag is not on then everything should go according to plan
@@ -245,7 +251,8 @@ void Parse() {
         {
             //this loop will set num_1_str to
             addFlag = true;
-            num_2 = 0;
+            num_2 = 0.0;
+            num_2_str = "0";
             //if the number is not negative
             if(leftNegative == false)
             {
@@ -253,13 +260,13 @@ void Parse() {
               {
                 num_1_str = num_1_str + input[i];
               }
-              num_1 = num_1_str.toFloat();
+              num_1 = num_1_str.toDouble();
             }else{//if the number is negative
               for(int i= 1; i < input.length(); ++i)
               {
                 num_1_str = num_1_str + input[i];
               }
-              num_1 = num_1_str.toFloat();
+              num_1 = num_1_str.toDouble();
               //set num to negative version
               num_1 = num_1 * (-1);
             }
@@ -295,14 +302,14 @@ void Parse() {
               num_2_str = num_2_str + input[i];
             }
           }
-          num_1 = num_1_str.toFloat();
+          num_1 = num_1_str.toDouble();
           //converts num 1 to negative if lefthand negative flag is set
           if(leftNegative == true)
           {
           num_1 = num_1 * (-1);
           }
           //creates num_2 and sets it negative if rightHand negative is true            
-          num_2 = num_2_str.toFloat();
+          num_2 = num_2_str.toDouble();
           if(rightNegative == true)
           {
             num_2 = num_2 * (-1);
@@ -327,10 +334,44 @@ void Error(){
   lcd.setCursor(0,1);
   lcd.print("                ");
   lcd.setCursor(0,0);
-  lcd.print("Error");
-  delay(2000);
-  lcd.setCursor(0,0);
-  lcd.print("                ");
+  if (noNum) {
+    manyOps = false;
+    overflowFlag = false;
+    noNum = false;
+    lcd.print("Too Few Numbers");
+    delay(2000);
+    lcd.setCursor(0,0);
+    lcd.print("                ");
+    return;
+  }
+  else if (overflowFlag) {
+    manyOps = false;
+    overflowFlag = false;
+    noNum = false;
+    lcd.print("Overflow UwU");
+    delay(2000);
+    lcd.setCursor(0,0);
+    lcd.print("                ");
+    return;
+  }
+  else if (manyOps) {
+    manyOps = false;
+    overflowFlag = false;
+    noNum = false;
+    lcd.print("Too Many Ops!");
+    delay(2000);
+    lcd.setCursor(0,0);
+    lcd.print("                ");
+    return;
+  }
+  else {
+    lcd.print("Unknown Error");
+    delay(2000);
+    lcd.setCursor(0,0);
+    lcd.print("                ");
+    return;
+  }
+
 }
 
 void Clear_Int() {
