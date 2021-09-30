@@ -19,7 +19,7 @@ char keymap[keyRows][keyCols]=
 {'1', '2', '3', '+'},
 {'4', '5', '6', '-'},
 {'7', '8', '9', '*'},
-{'!', '0', '.', '/'}
+{'=', '0', '.', '/'}
 };
 
 byte rowPins[keyRows] = {10, 9 , 8, 7}; //Rows 0 to 3
@@ -32,7 +32,6 @@ double num_1, num_2, ans;
 String num_1_str ="", num_2_str="", input ="";
 bool mulFlag = false, addFlag = false, subFlag = false, divFlag = false, clearFlag = false, prevCalc = false;
 bool errorFlag = false, overflowFlag = false, manyOps = false, noNum = false;
-char x[16];
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
@@ -63,7 +62,7 @@ void loop(){
     lcd.print("                ");
   }
   if (keyEntry != NO_KEY) {
-    if (keyEntry == '!') {
+    if (keyEntry == '=') {
       Submit();
     }
     else {
@@ -87,6 +86,7 @@ void Submit() {
         Error();
       }
       else {
+        char x[16];
         dtostrf(ans, 8, 3, x);
         lcd.setCursor(0,1);
         lcd.print(x);
