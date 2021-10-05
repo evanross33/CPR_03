@@ -226,16 +226,30 @@ void Parse() {
                 {
                   subFlag = true;
                   opIndex=counter;
+                }else{
+                  if(input[counter+1] = '-')
+                  {
+                    errorFlag = true; 
+                    manyOps = true;
+                  }
                 }
+                //if there is a '-' after the current '-'
                 if(input[counter+1] == '-')
                 {
                   if(input[counter + 2] != '+' && input[counter + 2] != '-' && input[counter + 2] != '*' && input[counter+2] != '/'){
+                    if(rightNegative == true)
+                    {
+                      errorFlag = true;
+                      manyOps = true;
+                    }
                     rightNegative = true;
                     ++counter;
                   }else{
+                    manyOps = true;
                     errorFlag = true;
                   }
                 }
+                if(input[counter+1]!= '.' && !(input[counter + 1] >= '0' && input[counter + 1] <= '9')) {errorFlag = true; manyOps = true;}
                 break;
               }else{//subFlag is already turned on
                 manyOps = true;
@@ -433,8 +447,10 @@ void decimalCheck()
     if(num_1_str[i] == '.')
     ++decimals;
   }
-  if (decimals > 1)
+  if (decimals > 1) {
   errorFlag = true;
+  manyOps = true;
+  }
   
   //check num2 string
   decimals = 0;
@@ -444,6 +460,8 @@ void decimalCheck()
     if(num_2_str[i] == '.')
     ++decimals;
   }
-  if (decimals > 1)
+  if (decimals > 1) {
   errorFlag = true;
+  manyOps = true;
+  }
 }
