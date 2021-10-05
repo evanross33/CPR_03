@@ -379,7 +379,7 @@ void Error(){
     manyOps = false;
     overflowFlag = false;
     noNum = false;
-    lcd.print("Overflow UwU");
+    lcd.print("Overflow Error");
     delay(2000);
     lcd.setCursor(0,0);
     lcd.print("                ");
