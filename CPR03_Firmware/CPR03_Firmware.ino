@@ -39,7 +39,9 @@ bool errorFlag = false, overflowFlag = false, manyOps = false, noNum = false;
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 void setup(){
+  //Assigning the pushbutton to a system interrupt to trigger a clear
   attachInterrupt(digitalPinToInterrupt(2), Clear_Int, RISING);
+  //LCD Setup
   lcd.init();
   lcd.backlight();
   lcd.setCursor(0,0);
@@ -53,22 +55,22 @@ void setup(){
 
 void loop(){
   lcd.setCursor(0,0);
-  char keyEntry = myKeypad.getKey();
-  if (clearFlag) {
+  char keyEntry = myKeypad.getKey(); //Wait for Keypad Input...
+  if (clearFlag) { //Check if SysInt has been triggered
     clearFlag = 0;
     Clear();
   }
-  if (prevCalc) {
+  if (prevCalc) { //Check if this iteration is happening after a previous calculation (Clear old ans)
     prevCalc = false;
     Wipe_Vars();
     lcd.setCursor(0,0);
     lcd.print("                ");
   }
-  if (keyEntry != NO_KEY) {
+  if (keyEntry != NO_KEY) { //Check if Equals key has been submitted, if true call Submit()
     if (keyEntry == '=') {
       Submit();
     }
-    else {
+    else { //If key is not '=', attach char to the end of the input string
       lcd.setCursor(0,1);
       lcd.print("                   ");
       input = input + keyEntry;
@@ -79,40 +81,41 @@ void loop(){
 }
 
 void Submit() {
-    Parse();
-    if (errorFlag) {
+    Parse(); //Call Parse() to parse out the input
+    if (errorFlag) { //Check if Parse() threw an error
       Error();
     }
     else {
-      Calculate();
-      if (errorFlag) {
+      Calculate(); //If Parse did not Error, Call Calculate()
+      if (errorFlag) { //Check if Calculate Threw an Error
         Error();
       }
       else {
-        char x[16];
+        char x[16]; //If Parse() and Calculate() did not error, display result
         dtostrf(ans, 8, 3, x);    
         String TempStr = String(x);
 
-        if(TempStr.length() > 12) {
+        if(TempStr.length() > 12) { //Output extends Precision of Arduino Double? if Yes display in Scientific Notation
            dtostre(ans,x,DTOSTR_ALWAYS_SIGN,DTOSTR_UPPERCASE);
            lcd.setCursor(0,1);
            lcd.print(x);
         }     
-        else {
-           lcd.setCursor(0,1);
+        else { //Else display normally
+           lcd.setCursor(0,1); 
            lcd.print(x);
         }
       }
     }
   }
 
+//Calculate is responsible for mathing num_1 and num_2 after Parse() has determined them
 void Calculate() {
-  if(input == "-" || input == "+" || input == "/" || input == "*" || num_2_str == ""){
+  if(input == "-" || input == "+" || input == "/" || input == "*" || num_2_str == ""){ //Last minute Error Checking for Bad Input
     noNum = true;
     errorFlag = true;
     return;
   }
-  if (addFlag) {
+  if (addFlag) { //The following will do the proper calcuation based on what op has been found by Parse()
     addFlag = false;
     prevCalc = true;
     ans = num_1 + num_2;
@@ -132,7 +135,7 @@ void Calculate() {
     prevCalc = true;
     ans = num_1 / num_2;
   }
-  else {
+  else { //If no opFlag is set Error out (Should never get to Calculate() with no OpFlag set but just in case)
     errorFlag = true;
   }
 }
@@ -386,6 +389,7 @@ void Error(){
 
 }
 
+//Clear_Int() first debounces the push button and then proceeds to set the clearFlag 
 void Clear_Int() {
   static unsigned long last_interrupt_time = 0;
   unsigned long interrupt_time = millis();
@@ -395,6 +399,7 @@ void Clear_Int() {
   interrupt_time = last_interrupt_time;
 }
 
+//Clear() Resets all Variables and LCD to their inital states
 void Clear() {
   lcd.setCursor(0,0);
   lcd.print("                ");
@@ -408,6 +413,7 @@ void Clear() {
   lcd.print("                ");
 }
 
+//Wipe_Vars() is a helper function of Clear(), Wipe_Vars() resets only the Variables
 void Wipe_Vars() {
   num_1 = 0;
   num_2 = 0;
