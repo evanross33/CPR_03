@@ -14,9 +14,6 @@ void Clear();
 const int keyRows= 4; //Keypad Rows
 const int keyCols= 4; //Keypad Columns
 
-//bool DTOSTR_ALWAYS_SIGN = true;
-//bool DTOSTR_UPPERCASE = true;
-
 char keymap[keyRows][keyCols]=
 {
 {'1', '2', '3', '+'},
