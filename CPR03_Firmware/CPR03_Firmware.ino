@@ -14,6 +14,9 @@ void Clear();
 const int keyRows= 4; //Keypad Rows
 const int keyCols= 4; //Keypad Columns
 
+//bool DTOSTR_ALWAYS_SIGN = true;
+//bool DTOSTR_UPPERCASE = true;
+
 char keymap[keyRows][keyCols]=
 {
 {'1', '2', '3', '+'},
@@ -87,9 +90,18 @@ void Submit() {
       }
       else {
         char x[16];
-        dtostrf(ans, 8, 3, x);
-        lcd.setCursor(0,1);
-        lcd.print(x);
+        dtostrf(ans, 8, 3, x);    
+        String TempStr = String(x);
+
+        if(TempStr.length() > 12) {
+           dtostre(ans,x,DTOSTR_ALWAYS_SIGN,DTOSTR_UPPERCASE);
+           lcd.setCursor(0,1);
+           lcd.print(x);
+        }     
+        else {
+           lcd.setCursor(0,1);
+           lcd.print(x);
+        }
       }
     }
   }
