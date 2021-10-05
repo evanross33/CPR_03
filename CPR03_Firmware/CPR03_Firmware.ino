@@ -10,6 +10,8 @@ void Error();
 void Submit();
 void Wipe_Vars();
 void Clear();
+void decimalCheck();
+
 
 const int keyRows= 4; //Keypad Rows
 const int keyCols= 4; //Keypad Columns
@@ -327,6 +329,9 @@ void Parse() {
             num_2 = num_2 * (-1);
           }
         }
+        //decimal check is performed here because string to double does not crash the program even if there are multiple decimals in 
+        //one string number, so decimalCheck is performed here in order to not liter the program with checks
+        decimalCheck();
     }else{/*serial.print("There was an error, too many operators")*/}
 }
 
@@ -417,4 +422,28 @@ void Wipe_Vars() {
   num_1_str = "";
   num_2_str = "";
   input = "";
+}
+
+//this function will check num1 string and num2 string in order to see if there is more than one decimal in the number, if there is errorflag will be set
+void decimalCheck()
+{
+  int decimals = 0;
+  for (int i = 0; i < num_1_str.length(); ++i)
+  {
+    if(num_1_str[i] == '.')
+    ++decimals;
+  }
+  if (decimals > 1)
+  errorFlag = true;
+  
+  //check num2 string
+  decimals = 0;
+
+  for (int i = 0; i < num_2_str.length(); ++i)
+  {
+    if(num_2_str[i] == '.')
+    ++decimals;
+  }
+  if (decimals > 1)
+  errorFlag = true;
 }
